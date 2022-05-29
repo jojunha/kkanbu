@@ -1,0 +1,7 @@
+<launch>
+	<node pkg="sensor_fusion" type="merge_circle" name="merge_circle" output="screen">
+    </node>
+
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find sensor_fusion)/rviz/a.rviz"> 
+    </node>
+</launch>
