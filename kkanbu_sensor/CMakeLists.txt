@@ -31,6 +31,7 @@ find_package(OpenCV REQUIRED)
 
 add_message_files(
   FILES
+  object_info.msg
 #  C_Obstacle.msg
 #  C_Obstacles.msg
 #  current_state.msg
@@ -74,6 +75,15 @@ target_link_libraries(kkanbu_pose
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
 )
+
+add_executable(yolo_detection src/yolo_detection.cpp )
+add_dependencies(yolo_detection ${${PROJECT_NAME}_EXPORTED_TARGETS} ${caktin_EXPORTED_TARGETS})
+target_link_libraries(yolo_detection
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+)
+
+
 add_executable(kkanbu_merge src/kkanbu_merge.cpp)
 add_dependencies(kkanbu_merge 
 	${${PROJECT_NAME}_EXPORTED_TARGETS} 

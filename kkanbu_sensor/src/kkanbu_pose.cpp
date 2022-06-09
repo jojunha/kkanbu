@@ -6,6 +6,7 @@ poseEstimation::poseEstimation()
     int buffer_size = 5;
     GNSS_sub = nh.subscribe("/ublox_msgs/navpvt", buffer_size, &poseEstimation::GNSS_Callback, this);
     IMU_sub = nh.subscribe("/camera/gyro/sample", buffer_size, &poseEstimation::IMU_Callback, this);
+    nh.param("kkanbu_sensor/ego/initial_yaw", current_state.yaw, 0.0);
 
     m_pub_current_state = nh.advertise<kkanbu_msgs::current_state>("/current_state", buffer_size);
 
@@ -108,7 +109,6 @@ void poseEstimation::IMU_Callback(const sensor_msgs::Imu:: ConstPtr &msg){
         prev_time = 0;
 
         current_state.velocity = 0;
-        current_state.yaw = 0;
         current_state.yaw_rate = 0;
         isInitIMU = true;
     }
