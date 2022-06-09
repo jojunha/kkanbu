@@ -6,7 +6,9 @@ poseEstimation::poseEstimation()
     int buffer_size = 5;
     GNSS_sub = nh.subscribe("/ublox_msgs/navpvt", buffer_size, &poseEstimation::GNSS_Callback, this);
     IMU_sub = nh.subscribe("/camera/gyro/sample", buffer_size, &poseEstimation::IMU_Callback, this);
-    nh.param("kkanbu_sensor/ego/initial_yaw", current_state.yaw, 0.0);
+    nh.param<double>("kkanbu_pose/initial_yaw", current_state.yaw, 0.0);
+
+    // std::cout << "initial yaw  " << current_state.yaw << std::endl;
 
     m_pub_current_state = nh.advertise<kkanbu_msgs::current_state>("/current_state", buffer_size);
 
@@ -105,15 +107,14 @@ void poseEstimation::IMU_Callback(const sensor_msgs::Imu:: ConstPtr &msg){
 
     if(!isInitIMU){
         distance = 0;
-        prev_yaw = 0;
-        prev_time = 0;
-
-        current_state.velocity = 0;
-        current_state.yaw_rate = 0;
+        prev_yaw = current_state.yaw;
+        prev_time = ros::Time::now().toSec();
         isInitIMU = true;
     }
     
     current_state.yaw_rate = (double) msg->angular_velocity.y * RAD2DEG; // deg/s
+
+    // std::cout << "yaw_rate " << current_state.yaw_rate << std::endl;
 
     if (current_state.yaw_rate < 0.1 && current_state.yaw_rate > -0.1){
         current_state.yaw_rate = 0;
@@ -142,11 +143,12 @@ void poseEstimation::IMU_Callback(const sensor_msgs::Imu:: ConstPtr &msg){
 
 
     prev_yaw = current_state.yaw;
+    // std::cout << current_state.yaw << std::endl;
 
 }
 void poseEstimation::publish_currentstate(){
 
-    if(isInitGNSS || isInitIMU){
+    if(isInitGNSS && isInitIMU){
         kkanbu_msgs::current_state pub_state;
         pub_state.x = current_state.x;
         pub_state.y = current_state.y;
@@ -157,7 +159,7 @@ void poseEstimation::publish_currentstate(){
         m_pub_current_state.publish(pub_state);
     }
     else{
-        std::cout << "Not Sensor!!" << std::endl;
+        std::cout << "No Sensor!!" << std::endl;
     }
 
 }

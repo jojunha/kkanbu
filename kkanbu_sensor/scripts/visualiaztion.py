@@ -85,12 +85,12 @@ base = [37.5416,  127.0792]  # konkuk univ.
 ############## mode ##############
 mode = 'yolo'
 
-if(mode=='crack'): # crack mode
-    map = crack_Map(center = base, zoom_start = 18)
-    map.showMap()
-else: # yolo mode
-    map = yolo_Map(center = base, zoom_start = 18)
-    map.showMap()
+# if(mode=='crack'): # crack mode
+#     map = crack_Map(center = base, zoom_start = 18)
+#     map.showMap()
+# else: # yolo mode
+#     map = yolo_Map(center = base, zoom_start = 18)
+#     map.showMap()
 
 
 def GnssCB(msg):
@@ -114,7 +114,7 @@ def CrackCB(msg):
 def YoloCB(msg):
     global latitude
     global longitude
-    
+
     if(latitude == 0):
         return
     else:
@@ -153,9 +153,9 @@ if __name__ == "__main__":
 
     while not rospy.is_shutdown():
 
-        if(latitude != 0):
-            map.mark(latitude, longitude, 'car', 'car.png')
-            map.showMap()
+        # if(latitude != 0):
+        #     map.mark(latitude, longitude, 'car', 'car.png')
+        #     map.showMap()
             
         rate.sleep()
 
