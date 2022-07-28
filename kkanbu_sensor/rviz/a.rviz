@@ -6,6 +6,8 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /MarkerArray1
+        - /MarkerArray3/Status1
       Splitter Ratio: 0.5
     Tree Height: 549
   - Class: rviz/Selection
@@ -65,7 +67,7 @@ Visualization Manager:
       Marker Topic: /viz_lidar_circle
       Name: MarkerArray
       Namespaces:
-        {}
+        basic_shapes: true
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
@@ -73,8 +75,23 @@ Visualization Manager:
       Marker Topic: /viz_merge_circle
       Name: MarkerArray
       Namespaces:
-        {}
+        basic_shapes: true
       Queue Size: 100
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /viz_final_circle
+      Name: MarkerArray
+      Namespaces:
+        basic_shapes: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Axes
+      Enabled: true
+      Length: 1
+      Name: Axes
+      Radius: 0.10000000149011612
+      Reference Frame: <Fixed Frame>
       Value: true
   Enabled: true
   Global Options:
@@ -103,7 +120,7 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Angle: 0
+      Angle: 1.574999213218689
       Class: rviz/TopDownOrtho
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
@@ -113,11 +130,11 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 39.176998138427734
+      Scale: 126.4956283569336
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz)
-      X: 0.45651859045028687
-      Y: -0.6155402660369873
+      X: 0.6788433790206909
+      Y: -0.007426178082823753
     Saved: ~
 Window Geometry:
   Displays:
@@ -136,4 +153,4 @@ Window Geometry:
     collapsed: false
   Width: 1267
   X: 67
-  Y: 30
+  Y: 27

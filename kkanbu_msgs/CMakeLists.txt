@@ -60,6 +60,9 @@ add_message_files(
   Obstacles.msg
   SegmentObstacle.msg
   CircleObstacle.msg
+  LandmarkPath.msg
+  LandmarkPoint.msg
+  LocalPathArray.msg
 )
 
 ## Generate services in the 'srv' folder

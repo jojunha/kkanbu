@@ -1,0 +1,7 @@
+<launch>
+	<node pkg="kkanbu_control" type="kkanbu_control" name="kkanbu_control" output="screen">
+        <param name="ego/target_velocity" value="1.0" />
+        <param name="ego/p_gain" value="110" />
+        <param name="ego/lookAhead" value="70" />
+    </node>
+</launch>

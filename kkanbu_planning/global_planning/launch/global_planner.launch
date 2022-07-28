@@ -1,0 +1,23 @@
+<?xml version="1.0"?> 
+<launch>
+	<arg name="mode" default='1'/>
+
+	<arg name="map1" default="$(find global_planning)/map/kong_a.csv"/>
+	<arg name="map2" default="$(find global_planning)/map/kong_b.csv"/>
+	<arg name="map3" default="$(find global_planning)/map/kong_new.csv"/>	
+
+	<!-- <arg name="map" value="$(arg map1)" if="$(eval mode=='1')"/>
+	<arg name="map" value="$(arg map2)" if="$(eval mode=='2')"/>
+	<arg name="map" value="$(arg map3)" if="$(eval mode=='3')"/> -->
+
+	<param name="map" value="$(arg map3)"/>	
+
+
+	<!--param name="map" value="$(arg map1)" if="$(mode==1)" />
+	<param name="map" value="$(arg map2)" if="$(mode==2)" />
+	<-param name="map" value="$(arg map3)" if="$(mode==3)" /-->
+	
+	<node pkg='global_planning' type='Get_GPS.py' name='global_planning_gps' output='screen' respawn='true'/>
+	<node pkg='global_planning' type='global_planning' name='global_planning_wp' output='screen' respawn='false'/>	
+	<!-- <node pkg="rviz" type="rviz" name="rviz" args="-d $/home/jh/Documents/GitHub/Guide_Konkuk/src/global_planning/map/map.rviz" /> -->
+</launch>

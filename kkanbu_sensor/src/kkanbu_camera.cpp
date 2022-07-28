@@ -3,6 +3,8 @@
 camera::camera(){
   image_depth = nh.subscribe("/camera/depth/image_rect_raw", 1, &camera::depthCb, this);
   yolo_bounding = nh.subscribe("/darknet_ros/bounding_boxes", 1, &camera::boundingCb, this);
+  image_ = nh.subscribe("/camera/color/image_raw", 1, &camera::cameraCb, this);
+
 
   c_obstacle = nh.advertise<kkanbu_msgs::C_Obstacles>("C_Obstacles", 1); 
 
@@ -69,7 +71,25 @@ kkanbu_msgs::C_Obstacle camera::object_info(int xmin, int xmax, double depth, st
 
   return obstacle;
 }
+void camera::cameraCb(const sensor_msgs::ImageConstPtr& msg)
+{
+  cv_bridge::CvImagePtr cv_ptr1;
+  try
+  {
+    cv_ptr1 = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+  }
+  catch (cv_bridge::Exception& e)
+  {
 
+    ROS_ERROR("cv_bridge exception: %s", e.what());
+    return;
+  }
+  // cout << "depth size!!"<<cv_ptr->image.size()<<endl;
+  image= cv_ptr1->image;
+  ROS_INFO("image col : %d", image.cols);
+  ROS_INFO("image row : %d", image.rows);
+
+}
 void camera::depthCb(const sensor_msgs::ImageConstPtr& msg)
 {
   cv_bridge::CvImagePtr cv_ptr;
@@ -84,6 +104,9 @@ void camera::depthCb(const sensor_msgs::ImageConstPtr& msg)
   }
   // cout << "depth size!!"<<cv_ptr->image.size()<<endl;
   depth_image= cv_ptr->image;
+  ROS_INFO("detph col : %d",  depth_image.cols);
+  ROS_INFO("depth row : %d", depth_image.rows);
+
 }
 
 void camera::boundingCb(const darknet_ros_msgs::BoundingBoxes::ConstPtr& msg)
@@ -100,7 +123,12 @@ void camera::boundingCb(const darknet_ros_msgs::BoundingBoxes::ConstPtr& msg)
       c_obs.camera_obstacle.push_back(ob);
     }
   }
-  c_obstacle.publish(c_obs);
+  if(image.cols == depth_image.cols && image.rows == depth_image.rows ){
+    c_obstacle.publish(c_obs);
+  }
+  else{
+    ROS_INFO("no match image size");
+  }
 
 }
 

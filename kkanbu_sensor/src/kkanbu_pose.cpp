@@ -5,13 +5,10 @@ poseEstimation::poseEstimation()
 {
     int buffer_size = 5;
     GNSS_sub = nh.subscribe("/ublox_msgs/navpvt", buffer_size, &poseEstimation::GNSS_Callback, this);
-    IMU_sub = nh.subscribe("/camera/gyro/sample", buffer_size, &poseEstimation::IMU_Callback, this);
+    IMU_sub = nh.subscribe("/imu/data", buffer_size, &poseEstimation::IMU_Callback, this);
     nh.param<double>("kkanbu_pose/initial_yaw", current_state.yaw, 0.0);
 
-    // std::cout << "initial yaw  " << current_state.yaw << std::endl;
-
     m_pub_current_state = nh.advertise<kkanbu_msgs::current_state>("/current_state", buffer_size);
-
 }
 poseEstimation::~poseEstimation()
 {
@@ -24,28 +21,69 @@ void poseEstimation::GNSS_Callback(const ublox_msgs::NavPVT::ConstPtr &msg) {
         double longitude = (double)(msg->lon)/10000000.0;
 
         init_local = convert_to_map_frame(latitude,longitude);
+        gnss_prev_time = ros::Time::now().toSec();
 
         prev_local = init_local;
         current_state.x = 0;
         current_state.y = 0;
+
         isInitGNSS = true;
     }
     
     double latitude = (double)(msg->lat)/10000000.0;
     double longitude = (double)(msg->lon)/10000000.0;
+
  
     local = convert_to_map_frame(latitude, longitude);
 
-    distance = sqrt(pow(local.y - prev_local.y, 2) +
-                                pow(local.x - prev_local.x, 2));
-    // std::cout << "distance : " << distance << std::endl;
+    double gnss_c_time = ros::Time::now().toSec();
+
+
+
+
+    // std::cout << "time ::: "  << (c_time-prev_time)<< std::endl;
+
+    distance = sqrt(pow(local.y - prev_local.y, 2) + pow(local.x - prev_local.x, 2));
+    current_state.velocity = distance / (gnss_c_time-gnss_prev_time);
+    std::cout << "velocity : " << current_state.velocity  << std::endl;
+
+    if (current_state.velocity > 0.8)
+    {
+    
+        // if ((local.x - prev_local.x)>0.1 && (local.y - prev_local.y)>0.1){  
+            heading_deg = atan2(local.y - prev_local.y, local.x - prev_local.x);
+            // std::cout << "===========================atan2===========================" << heading_deg << std::endl;
+            heading_deg = -heading_deg*180.0/M_PI;
+
+            if(heading_deg > 360){
+                heading_deg -= 360;
+            }
+            if(heading_deg > 180){
+                heading_deg -= 360;
+            }
+            if(heading_deg < -360){
+                heading_deg += 360;
+            }
+            if(heading_deg < -180){
+                heading_deg += 360;    
+            }
+            std::cout << "=========================== Estimated Pose ===========================\n"
+                            <<"yaw[deg]: " << heading_deg << std::endl;
+        
+            current_state.yaw = heading_deg;
+            prev_yaw = heading_deg;
+        // }
+
+    }
+
 
     current_state.x = local.x;
     current_state.y = local.y;
     
+    // std::cout << "x : "<< current_state.x << " y : "  << current_state.y << std::endl;
+    
     prev_local = local;
-
-    // m_pub_gnss_enu_pose.publish(gnss_enu);
+    gnss_prev_time = gnss_c_time;
 
     return;
 }
@@ -105,26 +143,28 @@ double poseEstimation::FnKappaLon(double dRef_Latitude, double dHeight)
 
 void poseEstimation::IMU_Callback(const sensor_msgs::Imu:: ConstPtr &msg){
 
-    if(!isInitIMU){
+    if(!isInitIMU) {
         distance = 0;
         prev_yaw = current_state.yaw;
-        prev_time = ros::Time::now().toSec();
+        imu_prev_time = ros::Time::now().toSec();
         isInitIMU = true;
     }
     
-    current_state.yaw_rate = (double) msg->angular_velocity.y * RAD2DEG; // deg/s
+    current_state.yaw_rate = -((double) msg->angular_velocity.z); // deg/s
 
     // std::cout << "yaw_rate " << current_state.yaw_rate << std::endl;
 
-    if (current_state.yaw_rate < 0.1 && current_state.yaw_rate > -0.1){
+    if (current_state.yaw_rate < 0.05 && current_state.yaw_rate > -0.05){
         current_state.yaw_rate = 0;
     }
     
-    double c_time = ros::Time::now().toSec();
+    double imu_c_time = ros::Time::now().toSec();
     
-    current_state.velocity = distance / (c_time-prev_time); // m/s
-    current_state.yaw = prev_yaw + (current_state.yaw_rate * (c_time-prev_time)); // deg
-    prev_time = c_time;
+    // current_state.velocity = distance / (imu_c_time-imu_prev_time); // m/s
+    current_state.yaw = prev_yaw + (current_state.yaw_rate * RAD2DEG * (imu_c_time-imu_prev_time)); // deg
+
+    // std::cout << "yaw : " << current_state.yaw << std::endl;
+
 
     
     if(current_state.yaw > 360){
@@ -143,17 +183,18 @@ void poseEstimation::IMU_Callback(const sensor_msgs::Imu:: ConstPtr &msg){
 
 
     prev_yaw = current_state.yaw;
-    // std::cout << current_state.yaw << std::endl;
-
+    imu_prev_time = imu_c_time;
 }
+
 void poseEstimation::publish_currentstate(){
 
     if(isInitGNSS && isInitIMU){
+
         kkanbu_msgs::current_state pub_state;
         pub_state.x = current_state.x;
         pub_state.y = current_state.y;
         pub_state.velocity = current_state.velocity;
-        pub_state.yaw = current_state.yaw;
+        pub_state.yaw = current_state.yaw*M_PI/180.0;
         pub_state.yaw_rate = current_state.yaw_rate;
 
         m_pub_current_state.publish(pub_state);

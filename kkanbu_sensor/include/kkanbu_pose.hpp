@@ -81,10 +81,11 @@ class poseEstimation
         current_state current_state;
 
         double prev_yaw;
-        double prev_time;
+        double imu_prev_time;
+        double gnss_prev_time;
         
         double distance;
-
+        double heading_deg;
 
     private:
         struct local convert_to_map_frame(double lat, double lon);

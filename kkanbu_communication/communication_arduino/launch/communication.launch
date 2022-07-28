@@ -1,0 +1,7 @@
+<launch>
+	<node pkg="communication_arduino" type="communication_arduino" name="communication_arduino" output="screen">
+        <param name="ego/init_x" value="2.1828728913" />
+        <param name="ego/init_y" value="-1.48723699614" />
+        <param name="ego/init_yaw" value="-0.0369807649712" />
+    </node>
+</launch>
