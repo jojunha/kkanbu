@@ -21,5 +21,5 @@
 		├── ublox(GNSS),
 		├── rplidar_ros(Lidar)
 		├── obstacle_detector(Lidar)
-		├── realsense-ros(stereo camera)
+		├── realsense-ros(Stereo Camera)
 		├── darknet_ros(YOLO)
