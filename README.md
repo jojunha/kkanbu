@@ -16,9 +16,9 @@
 # Other open source packages (not included) 
 	└── open packages
 		├── myahrs_driver(IMU)
-		├── ntrip_ros(NRTK)
-		├── rtcm_msgs(NRTK msg)
-		├── ublox(GNSS),
+		├── ntrip_ros(Network RTK)
+		├── rtcm_msgs(Nwtwork RTK msg)
+		├── ublox(GNSS)
 		├── rplidar_ros(Lidar)
 		├── obstacle_detector(Lidar)
 		├── realsense-ros(Stereo Camera)
