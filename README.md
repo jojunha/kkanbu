@@ -13,7 +13,7 @@
 		└── kkanbu_visualization
 
 
-# Other open source packages (not included) 
+# Open Source Packages (not included) 
 	└── open packages
 		├── myahrs_driver(IMU)
 		├── ntrip_ros(Network RTK)
